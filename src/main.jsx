@@ -608,6 +608,16 @@ function ActivityDetailsPage() {
 
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(1);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/reviews/${id}`)
+      .then((res) => res.json())
+      .then((data) => setReviews(data))
+      .catch((err) => console.log(err));
+  }, [id]);
 
   if (!activity) {
     return (
@@ -616,6 +626,32 @@ function ActivityDetailsPage() {
       </main>
     );
   }
+
+  const addReview = async () => {
+    if (!reviewName.trim() || !reviewText.trim()) {
+      alert("Please enter your name and review.");
+      return;
+    }
+
+    const response = await fetch("http://localhost:5000/reviews", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        activityId: activity.id,
+        name: reviewName,
+        review: reviewText,
+      }),
+    });
+
+    const newReview = await response.json();
+
+    setReviews([...reviews, newReview]);
+    setReviewName("");
+    setReviewText("");
+    alert("Review added successfully!");
+  };
 
   const saveFavorite = () => {
     const favorites = getStored("seascape_favorites", []);
@@ -718,6 +754,48 @@ function ActivityDetailsPage() {
           >
             Open Location in Google Maps
           </a>
+
+          <section className="reviewsBox">
+            <h3>User Reviews</h3>
+
+            <label>
+              Name
+              <input
+                type="text"
+                value={reviewName}
+                onChange={(event) => setReviewName(event.target.value)}
+                placeholder="Enter your name"
+              />
+            </label>
+
+            <label>
+              Review
+              <textarea
+                value={reviewText}
+                onChange={(event) => setReviewText(event.target.value)}
+                placeholder="Write your review"
+                rows="4"
+              />
+            </label>
+
+            <button className="primaryBtn wide" type="button" onClick={addReview}>
+              Add Review
+            </button>
+
+            <div className="reviewsList">
+              {reviews.length === 0 ? (
+                <p className="muted">No reviews yet.</p>
+              ) : (
+                reviews.map((item) => (
+                  <div className="reviewCard" key={item.id}>
+                    <h4>{item.name}</h4>
+                    <p>{item.review}</p>
+                    <span>{item.date}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
         </div>
 
         <aside className="bookingBox" aria-label="Booking form">
