@@ -613,7 +613,7 @@ function ActivityDetailsPage() {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/reviews/${id}`)
+    fetch(`https://seascape-ksa-reviews.onrender.com/reviews/${id}`)
       .then((res) => res.json())
       .then((data) => setReviews(data))
       .catch((err) => console.log(err));
@@ -633,7 +633,7 @@ function ActivityDetailsPage() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/reviews", {
+    const response = await fetch("https://seascape-ksa-reviews.onrender.com/reviews", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
